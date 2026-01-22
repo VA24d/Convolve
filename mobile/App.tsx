@@ -660,7 +660,7 @@ function HomeScreen(props: HomeScreenProps): JSX.Element {
               <Text style={styles.label}>Use Vision (OpenAI)</Text>
               <Text style={styles.helper}>Enable to infer missing details from the photo.</Text>
             </View>
-            <Switch value={props.useVision} onValueChange={props.setUseVision} />
+            <Switch value={Boolean(props.useVision)} onValueChange={props.setUseVision} />
           </View>
           <Button
             title={props.loading ? "Analyzing..." : "Analyze"}
@@ -1077,7 +1077,7 @@ function SchemeFormScreen(props: SchemeFormScreenProps): JSX.Element {
               </Text>
             </View>
             <Switch
-              value={formData.consent}
+              value={Boolean(formData.consent)}
               onValueChange={function onToggle(value): void {
                 updateFormField("consent", value);
               }}
@@ -1101,14 +1101,14 @@ function SettingsScreen(props: SettingsScreenProps): JSX.Element {
               <Text style={styles.label}>Use Vision by default</Text>
               <Text style={styles.helper}>Enable photo inference whenever available.</Text>
             </View>
-            <Switch value={props.useVision} onValueChange={props.setUseVision} />
+            <Switch value={Boolean(props.useVision)} onValueChange={props.setUseVision} />
           </View>
           <View style={styles.toggleRow}>
             <View>
               <Text style={styles.label}>Auto read explanations</Text>
               <Text style={styles.helper}>Speak results automatically on the Results page.</Text>
             </View>
-            <Switch value={props.autoSpeak} onValueChange={props.setAutoSpeak} />
+            <Switch value={Boolean(props.autoSpeak)} onValueChange={props.setAutoSpeak} />
           </View>
         </View>
       </ScrollView>
