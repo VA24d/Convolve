@@ -7,8 +7,9 @@ that can run orchestration on-device.
 
 ## Highlights
 - Multimodal eligibility signals (text + optional photo analysis).
-- Qdrant-backed hybrid search with metadata filters.
-- Evidence-based explanations and memory recall for past cases.
+- Qdrant hybrid search (dense + sparse) with metadata filters.
+- Evidence-based explanations with traceable Qdrant point IDs.
+- Long-term memory that supports updates and recency-aware recall.
 - Mobile form drafts that prefill applicant details and shareable outputs.
 
 ## Repository Layout
@@ -39,7 +40,7 @@ Fill in:
 - `QDRANT_API_KEY`
 - `EMBEDDING_BACKEND=sentence-transformers` (default) or `openai`
 
-3. Ingest seed schemes:
+3. Ingest seed schemes (recreates the Qdrant scheme collection for hybrid vectors):
 
 ```bash
 python scripts/ingest_schemes.py
@@ -89,4 +90,5 @@ If you see the Expo AppEntry error, ensure `mobile/index.js` is present and `mai
 ## Notes
 - Uses Qdrant Cloud by default.
 - Streamlit UI is a demo; CLI available at `scripts/demo_cli.py`.
+- Memory updates are available via the `/memory/{case_id}` endpoint for feedback loops.
 - Keep secrets in `.env` and `mobile/config.ts` (ignored by Git).

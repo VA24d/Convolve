@@ -18,9 +18,10 @@ Qdrant is critical for semantic search + metadata filtering + memory storage.
 - **Embeddings**: sentence-transformers for text; optional OpenAI if configured.
 
 ## 4. Search / Memory / Recommendation Logic
-- **Search**: query embedding + filters (state, housing, caste, land).
-- **Memory**: each interaction is stored in a `case_memory` collection, enabling recall and updates.
-- **Recommendation**: top schemes with explanation of matched filters.
+- **Search**: hybrid retrieval (dense + sparse) with filters (state, housing, caste, land).
+- **Memory**: each interaction is stored in a `case_memory` collection with update-ready fields
+  (status, feedback score, chosen scheme). Recency-aware recall favors updated cases.
+- **Recommendation**: top schemes with explanation of matched filters + traceable Qdrant point IDs.
 - **Form readiness**: recommended schemes can be turned into prefilled form drafts with applicant
   details, ready to share with officials.
 
@@ -29,6 +30,7 @@ Each recommendation includes:
 - Retrieved scheme payload
 - The filter matches (signals vs. rules)
 - A traceable relevance score
+- Qdrant point IDs for auditability
 
 ## 6. Limitations & Ethics
 See `docs/ethics.md` for risks and mitigations.

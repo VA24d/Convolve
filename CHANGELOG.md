@@ -1,6 +1,13 @@
 # Changelog
 
 ## Unreleased
+- Added hybrid Qdrant retrieval (dense + sparse) with fusion queries for scheme matching.
+- Added sparse vector ingestion and collection recreation for hybrid search.
+- Added recency-aware memory recall and update-ready memory metadata.
+- Added memory update endpoint to store feedback and chosen scheme decisions.
+- Added traceable Qdrant point IDs to explanations.
+- Added ADR documenting hybrid dense + sparse retrieval design.
+- Updated docs to reflect hybrid retrieval, memory updates, and evidence tracing.
 - Restored memory-bank files locally and added them to .gitignore.
 - Removed memory-bank documentation artifacts from version control.
 - Refreshed README with clearer setup, architecture highlights, and usage flow.
