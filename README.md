@@ -1,9 +1,24 @@
 # Yojana-Drishti (Convolve 4.0 - Qdrant)
 
-A multimodal eligibility assistant for Indian welfare schemes. It uses Qdrant for filtered semantic search and memory, LangChain for embeddings, and an optional vision step for extracting eligibility signals from photos. The mobile app can run the orchestration locally using LangChain.js and direct Qdrant/OpenAI calls.
+Yojana-Drishti is a multimodal eligibility assistant for Indian welfare schemes. It combines
+signal extraction (text + optional vision), filtered semantic retrieval in Qdrant, and
+explainable recommendations. The project ships both a Streamlit demo and an Expo mobile app
+that can run orchestration on-device.
 
-## Setup
+## Highlights
+- Multimodal eligibility signals (text + optional photo analysis).
+- Qdrant-backed hybrid search with metadata filters.
+- Evidence-based explanations and memory recall for past cases.
+- Mobile form drafts that prefill applicant details and shareable outputs.
 
+## Repository Layout
+- `src/convolve/` - Core retrieval, memory, and vision orchestration.
+- `scripts/` - Ingest, demo CLI, and smoke tests.
+- `streamlit_app.py` - Desktop demo UI.
+- `mobile/` - Expo app with on-device LangChain.js orchestration.
+- `docs/` - Architecture, ethics, ADRs, and submission report.
+
+## Quickstart (Backend + Streamlit)
 1. Create a virtual environment and install dependencies:
 
 ```bash
@@ -30,36 +45,16 @@ Fill in:
 python scripts/ingest_schemes.py
 ```
 
-4. Run the demo UI:
+4. Run the Streamlit demo:
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-## Demo Flow
-- Upload a photo or use the fallback signals.
-- Provide state/caste/land to trigger heavy filtering.
-- See the matched schemes + traceable evidence.
-- Memory recall shows prior cases.
-
-## Documentation
-- `docs/report.md` - Submission-ready report
-- `docs/architecture.md` - Architecture overview
-- `docs/ethics.md` - Limitations & ethics
-- `docs/adr/0002-mobile-orchestration.md` - Mobile orchestration decision
-
-## Notes
-- Uses Qdrant Cloud by default.
-- Streamlit UI is for demo; CLI available at `scripts/demo_cli.py`.
-
 ## Mobile App (Expo)
 The mobile app runs LangChain orchestration on-device and talks directly to Qdrant/OpenAI.
-It supports selecting images from the photo library or capturing a photo on-device, and the
-eligibility form can be left partially blank when Vision is enabled to infer missing details.
-The Results screen now includes a scheme form workflow to prefill applicant details and
-share a scheme application draft, including a checklist of required documents.
-The new Home/Results/History/Settings navigation includes text-to-speech to read scheme
-explanations aloud on the Results screen.
+It supports photo capture/library selection, lets Vision fill missing details, and includes
+an end-to-end scheme form workflow for field officers.
 
 1. Configure `mobile/config.ts` with your OpenAI key + Qdrant URL/API key.
 2. Install Expo dependencies:
@@ -76,4 +71,22 @@ pnpm start
 ```
 
 Open Expo Go on your phone and scan the QR code (iOS requires the latest Expo Go SDK).
-If you see the Expo AppEntry error, ensure `mobile/index.js` is present and `main` is set to `index.js`.
+If you see the Expo AppEntry error, ensure `mobile/index.js` is present and `main` is set to
+`index.js`.
+
+## Demo Flow
+- Provide state/caste/land and optional assets/demographics.
+- Upload a photo to infer housing and asset signals.
+- Review matched schemes with traceable explanations.
+- Share prefilled scheme form drafts with required documents.
+
+## Documentation
+- `docs/report.md` - Submission-ready report
+- `docs/architecture.md` - Architecture overview
+- `docs/ethics.md` - Limitations & ethics
+- `docs/adr/0002-mobile-orchestration.md` - Mobile orchestration decision
+
+## Notes
+- Uses Qdrant Cloud by default.
+- Streamlit UI is a demo; CLI available at `scripts/demo_cli.py`.
+- Keep secrets in `.env` and `mobile/config.ts` (ignored by Git).

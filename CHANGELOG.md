@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Removed memory-bank documentation artifacts from version control.
+- Refreshed README with clearer setup, architecture highlights, and usage flow.
 - Hardened Switch state handling in the mobile app to coerce boolean values consistently.
 - Fixed Switch components to coerce boolean values in the mobile scheme form workflow.
 - Added scheme form draft workflow to the mobile Results screen, including prefilled applicant
