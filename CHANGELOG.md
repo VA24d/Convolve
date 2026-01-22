@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Restored memory-bank files locally and added them to .gitignore.
 - Removed memory-bank documentation artifacts from version control.
 - Refreshed README with clearer setup, architecture highlights, and usage flow.
 - Hardened Switch state handling in the mobile app to coerce boolean values consistently.
