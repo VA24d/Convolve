@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Hardened Switch state handling in the mobile app to coerce boolean values consistently.
 - Fixed Switch components to coerce boolean values in the mobile scheme form workflow.
 - Added scheme form draft workflow to the mobile Results screen, including prefilled applicant
   details, required-document checklist, and shareable draft export.

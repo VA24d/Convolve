@@ -126,6 +126,7 @@ type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home"> & {
   setAssets: (value: string) => void;
   setDemographics: (value: string) => void;
   setIntent: (value: string) => void;
+  setUseVision: (value: boolean) => void;
   setApplicantProfile: (value: ApplicantProfile) => void;
   onPickImage: () => Promise<void>;
   onTakePhoto: () => Promise<void>;
@@ -253,6 +254,24 @@ function formatNumberValue(value: number | null | undefined): string {
 
 function formatListValue(value: string[]): string {
   return value.length > 0 ? value.join(", ") : "";
+}
+
+function coerceBoolean(value: unknown): boolean {
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true";
+  }
+  return Boolean(value);
+}
+
+function logBooleanWarning(label: string, value: unknown): void {
+  if (typeof value === "boolean") {
+    return;
+  }
+  if (typeof value === "string") {
+    console.warn(`[App] ${label} expected boolean but received string: ${value}`);
+    return;
+  }
+  console.warn(`[App] ${label} expected boolean but received ${typeof value}`);
 }
 
 function buildFormData(
@@ -395,6 +414,12 @@ function HomeScreen(props: HomeScreenProps): JSX.Element {
   ): void {
     props.setApplicantProfile({ ...applicant, [key]: value });
   }
+
+  function handleVisionToggle(value: boolean): void {
+    props.setUseVision(coerceBoolean(value));
+  }
+
+  const useVisionValue = coerceBoolean(props.useVision);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -660,7 +685,7 @@ function HomeScreen(props: HomeScreenProps): JSX.Element {
               <Text style={styles.label}>Use Vision (OpenAI)</Text>
               <Text style={styles.helper}>Enable to infer missing details from the photo.</Text>
             </View>
-            <Switch value={Boolean(props.useVision)} onValueChange={props.setUseVision} />
+            <Switch value={useVisionValue} onValueChange={handleVisionToggle} />
           </View>
           <Button
             title={props.loading ? "Analyzing..." : "Analyze"}
@@ -1091,6 +1116,17 @@ function SchemeFormScreen(props: SchemeFormScreenProps): JSX.Element {
 }
 
 function SettingsScreen(props: SettingsScreenProps): JSX.Element {
+  function handleVisionToggle(value: boolean): void {
+    props.setUseVision(coerceBoolean(value));
+  }
+
+  function handleAutoSpeakToggle(value: boolean): void {
+    props.setAutoSpeak(coerceBoolean(value));
+  }
+
+  const useVisionValue = coerceBoolean(props.useVision);
+  const autoSpeakValue = coerceBoolean(props.autoSpeak);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -1101,14 +1137,14 @@ function SettingsScreen(props: SettingsScreenProps): JSX.Element {
               <Text style={styles.label}>Use Vision by default</Text>
               <Text style={styles.helper}>Enable photo inference whenever available.</Text>
             </View>
-            <Switch value={Boolean(props.useVision)} onValueChange={props.setUseVision} />
+            <Switch value={useVisionValue} onValueChange={handleVisionToggle} />
           </View>
           <View style={styles.toggleRow}>
             <View>
               <Text style={styles.label}>Auto read explanations</Text>
               <Text style={styles.helper}>Speak results automatically on the Results page.</Text>
             </View>
-            <Switch value={Boolean(props.autoSpeak)} onValueChange={props.setAutoSpeak} />
+            <Switch value={autoSpeakValue} onValueChange={handleAutoSpeakToggle} />
           </View>
         </View>
       </ScrollView>
@@ -1125,8 +1161,8 @@ export default function App(): JSX.Element {
   const [demographics, setDemographics] = useState("");
   const [intent, setIntent] = useState("");
   const [image, setImage] = useState<ImageState>(null);
-  const [useVision, setUseVision] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [useVision, setUseVision] = useState<boolean>(false);
+  const [autoSpeak, setAutoSpeak] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -1244,7 +1280,7 @@ export default function App(): JSX.Element {
         assets: parseList(assets),
         demographics: parseList(demographics),
         intent: normalizedIntent,
-        useVision,
+        useVision: useVisionValue,
         imageBase64: image?.base64 ?? null,
       });
 
@@ -1278,6 +1314,20 @@ export default function App(): JSX.Element {
     Speech.stop();
   }
 
+  function handleUseVisionChange(value: boolean): void {
+    setUseVision(coerceBoolean(value));
+  }
+
+  function handleAutoSpeakChange(value: boolean): void {
+    setAutoSpeak(coerceBoolean(value));
+  }
+
+  const useVisionValue = coerceBoolean(useVision);
+  const autoSpeakValue = coerceBoolean(autoSpeak);
+
+  logBooleanWarning("useVision", useVision);
+  logBooleanWarning("autoSpeak", autoSpeak);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -1295,7 +1345,7 @@ export default function App(): JSX.Element {
                   demographics={demographics}
                   intent={intent}
                   image={image}
-                  useVision={useVision}
+                  useVision={useVisionValue}
                   loading={loading}
                   error={error}
                   applicantProfile={applicantProfile}
@@ -1306,6 +1356,7 @@ export default function App(): JSX.Element {
                   setAssets={setAssets}
                   setDemographics={setDemographics}
                   setIntent={setIntent}
+                  setUseVision={handleUseVisionChange}
                   setApplicantProfile={setApplicantProfile}
                   onPickImage={pickImageFromLibrary}
                   onTakePhoto={takePhoto}
@@ -1319,7 +1370,7 @@ export default function App(): JSX.Element {
               return (
                 <ResultsScreen
                   {...props}
-                  autoSpeak={autoSpeak}
+                  autoSpeak={autoSpeakValue}
                   onSpeak={speakExplanations}
                   onStopSpeak={stopSpeech}
                 />
@@ -1347,10 +1398,10 @@ export default function App(): JSX.Element {
               return (
                 <SettingsScreen
                   {...props}
-                  useVision={useVision}
-                  setUseVision={setUseVision}
-                  autoSpeak={autoSpeak}
-                  setAutoSpeak={setAutoSpeak}
+                  useVision={useVisionValue}
+                  setUseVision={handleUseVisionChange}
+                  autoSpeak={autoSpeakValue}
+                  setAutoSpeak={handleAutoSpeakChange}
                 />
               );
             }}
