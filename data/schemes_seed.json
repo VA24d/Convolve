@@ -1,0 +1,119 @@
+[
+  {
+    "scheme_id": "pmay",
+    "scheme_name": "PM Awas Yojana",
+    "description": "Housing assistance for rural households without permanent pucca houses.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "housing": "kutcha",
+      "income_limit": 100000,
+      "assets_excluded": ["car"]
+    },
+    "benefits": "Financial aid up to ₹1.2 lakh for house construction",
+    "source_url": "https://pmayg.nic.in"
+  },
+  {
+    "scheme_id": "pmkisan",
+    "scheme_name": "PM-KISAN",
+    "description": "Income support for small and marginal farmers.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "land_max_acres": 5,
+      "income_limit": 200000
+    },
+    "benefits": "₹6,000 per year in three installments",
+    "source_url": "https://pmkisan.gov.in"
+  },
+  {
+    "scheme_id": "ujjwala",
+    "scheme_name": "Pradhan Mantri Ujjwala Yojana",
+    "description": "Subsidized LPG connections for women from low-income households.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "demographics_required": ["elderly female present"],
+      "income_limit": 150000
+    },
+    "benefits": "Free LPG connection and subsidy on cylinders",
+    "source_url": "https://www.pmuy.gov.in"
+  },
+  {
+    "scheme_id": "rural_roads",
+    "scheme_name": "Pradhan Mantri Gram Sadak Yojana",
+    "description": "All-weather road connectivity to rural habitations.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "housing": "kutcha"
+    },
+    "benefits": "Improved road connectivity for rural villages",
+    "source_url": "https://pmgsy.nic.in"
+  },
+  {
+    "scheme_id": "kcc",
+    "scheme_name": "Kisan Credit Card",
+    "description": "Flexible credit for farmers to meet agricultural expenses.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "land_max_acres": 10,
+      "assets_excluded": ["tractor"]
+    },
+    "benefits": "Low-interest credit line for crops and equipment",
+    "source_url": "https://pib.gov.in"
+  },
+  {
+    "scheme_id": "nsap",
+    "scheme_name": "National Social Assistance Programme",
+    "description": "Pension support for elderly and vulnerable citizens.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "demographics_required": ["elderly female present"]
+    },
+    "benefits": "Monthly pension support",
+    "source_url": "https://nsap.nic.in"
+  },
+  {
+    "scheme_id": "skill_india",
+    "scheme_name": "Skill India",
+    "description": "Skill development training for youth and women.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "demographics_required": ["school-age children"]
+    },
+    "benefits": "Free training and certification",
+    "source_url": "https://www.skillindia.gov.in"
+  },
+  {
+    "scheme_id": "apnabank",
+    "scheme_name": "Jan Dhan Yojana",
+    "description": "Financial inclusion with no-minimum-balance bank accounts.",
+    "states": ["All"],
+    "eligibility_rules": {
+      "income_limit": 200000
+    },
+    "benefits": "Zero-balance account with insurance cover",
+    "source_url": "https://pmjdy.gov.in"
+  },
+  {
+    "scheme_id": "drishti_state",
+    "scheme_name": "Rajasthan Farm Relief",
+    "description": "State support for distressed farmers in Rajasthan.",
+    "states": ["Rajasthan"],
+    "eligibility_rules": {
+      "land_max_acres": 2,
+      "caste": "SC"
+    },
+    "benefits": "Immediate relief grant for farmer households",
+    "source_url": "https://rajasthan.gov.in"
+  },
+  {
+    "scheme_id": "bihar_housing",
+    "scheme_name": "Bihar Rural Housing Top-up",
+    "description": "Additional housing support for kutcha houses in Bihar.",
+    "states": ["Bihar"],
+    "eligibility_rules": {
+      "housing": "kutcha",
+      "income_limit": 120000
+    },
+    "benefits": "Top-up grant for house construction",
+    "source_url": "https://bihar.gov.in"
+  }
+]

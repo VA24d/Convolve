@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Yojana-Drishti",
+    "slug": "yojana-drishti",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "sdkVersion": "54.0.0",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow access to capture photos for eligibility analysis.",
+        "NSPhotoLibraryUsageDescription": "Allow access to select photos for eligibility analysis."
+      }
+    }
+  }
+}
