@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+- Added a mobile Settings toggle to enable/disable backend mode on device.
+- Added mobile backend mode to retrieve hybrid results and memory IDs from the FastAPI API.
+- Added mobile case memory controls for status, feedback, chosen scheme, and evidence pack sharing.
+- Added filter-stress demo endpoint to compare retrieval under no/medium/heavy filters.
 - Added hybrid Qdrant retrieval (dense + sparse) with fusion queries for scheme matching.
 - Added sparse vector ingestion and collection recreation for hybrid search.
 - Added recency-aware memory recall and update-ready memory metadata.

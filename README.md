@@ -9,8 +9,8 @@ that can run orchestration on-device.
 - Multimodal eligibility signals (text + optional photo analysis).
 - Qdrant hybrid search (dense + sparse) with metadata filters.
 - Evidence-based explanations with traceable Qdrant point IDs.
-- Long-term memory that supports updates and recency-aware recall.
-- Mobile form drafts that prefill applicant details and shareable outputs.
+- Long-term memory that supports updates, recency-aware recall, and case status feedback.
+- Mobile evidence packs + form drafts that prefill applicant details and shareable outputs.
 
 ## Repository Layout
 - `src/convolve/` - Core retrieval, memory, and vision orchestration.
@@ -52,12 +52,21 @@ python scripts/ingest_schemes.py
 streamlit run streamlit_app.py
 ```
 
+5. Run the FastAPI backend:
+
+```bash
+python scripts/run_api.py
+```
+
 ## Mobile App (Expo)
-The mobile app runs LangChain orchestration on-device and talks directly to Qdrant/OpenAI.
-It supports photo capture/library selection, lets Vision fill missing details, and includes
-an end-to-end scheme form workflow for field officers.
+The mobile app runs LangChain orchestration on-device and can optionally call the FastAPI
+backend (for hybrid retrieval + memory IDs). It supports photo capture/library selection,
+lets Vision fill missing details, and includes an end-to-end scheme form workflow for field
+officers.
 
 1. Configure `mobile/config.ts` with your OpenAI key + Qdrant URL/API key.
+   - Set `BACKEND_URL` to use the backend-powered analyze + memory updates.
+   - Use the Settings screen toggle to enable/disable backend mode on device.
 2. Install Expo dependencies:
 
 ```bash
@@ -79,6 +88,7 @@ If you see the Expo AppEntry error, ensure `mobile/index.js` is present and `mai
 - Provide state/caste/land and optional assets/demographics.
 - Upload a photo to infer housing and asset signals.
 - Review matched schemes with traceable explanations.
+- Update case memory status/feedback and share an evidence pack.
 - Share prefilled scheme form drafts with required documents.
 
 ## Documentation
@@ -91,4 +101,6 @@ If you see the Expo AppEntry error, ensure `mobile/index.js` is present and `mai
 - Uses Qdrant Cloud by default.
 - Streamlit UI is a demo; CLI available at `scripts/demo_cli.py`.
 - Memory updates are available via the `/memory/{case_id}` endpoint for feedback loops.
+- Use `/demo/filter-stress` to compare retrieval under no/medium/heavy filters.
+- `python scripts/run_api.py` configures PYTHONPATH automatically.
 - Keep secrets in `.env` and `mobile/config.ts` (ignored by Git).
