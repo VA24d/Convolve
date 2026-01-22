@@ -55,7 +55,11 @@ class CaseMemory(BaseModel):
     query_intent: str
     retrieved_scheme_ids: list[str]
     chosen_scheme_id: str | None = None
+    status: Literal["draft", "submitted", "approved", "rejected"] | None = None
+    feedback_score: float | None = None
+    notes: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def summary_text(self) -> str:
         summary = self.signals.summary_text()

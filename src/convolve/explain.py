@@ -11,11 +11,13 @@ def explain_match(signals: EligibilitySignals, result: qdrant_models.ScoredPoint
     payload = result.payload or {}
     rules = payload.get("eligibility_rules", {})
     explanation = {
+        "scheme_id": payload.get("scheme_id"),
         "scheme_name": payload.get("scheme_name", "Unknown"),
         "benefits": payload.get("benefits", ""),
         "score": result.score,
         "matched_filters": {},
         "notes": signals.notes,
+        "point_id": str(result.id),
     }
 
     if signals.housing_type != "unknown":

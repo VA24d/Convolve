@@ -19,6 +19,7 @@ class RetrievalResult:
     schemes: list[qdrant_models.ScoredPoint]
     explanations: list[dict[str, object]]
     memories: list[qdrant_models.ScoredPoint]
+    memory_id: str
 
 
 def run_retrieval_pipeline(
@@ -35,9 +36,11 @@ def run_retrieval_pipeline(
 
     query_text = query_intent or signals.summary_text()
     query_vector = embedder.embed_query(query_text)
+    sparse_vector = qdrant.build_sparse_query(query_text)
 
     schemes = qdrant.search_schemes(
         query_vector=query_vector,
+        sparse_vector=sparse_vector,
         state=signals.state,
         housing=signals.housing_type if signals.housing_type != "unknown" else None,
         caste=signals.caste,
@@ -52,12 +55,14 @@ def run_retrieval_pipeline(
         signals=signals,
         query_intent=query_text,
         retrieved_scheme_ids=[str(scheme.id) for scheme in schemes],
+        status="draft",
     )
-    memory.save_case(case)
+    memory_id = memory.save_case(case)
 
     return RetrievalResult(
         signals=signals,
         schemes=schemes,
         explanations=explanations,
         memories=memories,
+        memory_id=memory_id,
     )
