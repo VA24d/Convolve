@@ -188,10 +188,18 @@ class QdrantService:
         }
 
     def _scheme_sparse_config(self) -> dict[str, qdrant_models.SparseVectorParams]:
+        modifier_type = getattr(qdrant_models, "Modifier", None)
+        if modifier_type is None:
+            return {
+                SPARSE_VECTOR_NAME: qdrant_models.SparseVectorParams(
+                    index=qdrant_models.SparseIndexParams(),
+                )
+            }
+
         return {
             SPARSE_VECTOR_NAME: qdrant_models.SparseVectorParams(
                 index=qdrant_models.SparseIndexParams(),
-                modifier=qdrant_models.Modifier.IDF,
+                modifier=modifier_type.IDF,
             )
         }
 
