@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from datetime import datetime, timezone
 from typing import Any, Literal
+from time import perf_counter
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -10,6 +11,7 @@ from qdrant_client import QdrantClient
 
 from convolve.chains import run_retrieval_pipeline
 from convolve.config import load_settings, require_qdrant_settings
+from convolve.embeddings import EmbeddingService
 from convolve.qdrant_client import QdrantService
 from convolve.schemas import EligibilitySignals
 from convolve.vision import VisionService, fallback_signals
@@ -44,6 +46,28 @@ class MemoryUpdateRequest(BaseModel):
     feedback_score: float | None = Field(default=None, ge=0, le=1)
     notes: str | None = None
     chosen_scheme_id: str | None = None
+
+
+class FilterStressRequest(BaseModel):
+    query_text: str
+    state: str | None = None
+    caste: str | None = None
+    land_acres: float | None = None
+    housing_type: str | None = None
+    limit: int = Field(default=3, ge=1, le=10)
+
+
+class FilterStressScenario(BaseModel):
+    label: str
+    filters: dict[str, Any] | None
+    elapsed_ms: float
+    scheme_ids: list[str]
+    point_ids: list[str]
+
+
+class FilterStressResponse(BaseModel):
+    query_text: str
+    scenarios: list[FilterStressScenario]
 
 
 @app.get("/health")
@@ -111,6 +135,72 @@ async def update_memory(case_id: str, update: MemoryUpdateRequest) -> dict[str, 
     qdrant = QdrantService(client)
     qdrant.update_case_memory(case_id, updates)
     return {"status": "updated"}
+
+
+@app.post("/demo/filter-stress", response_model=FilterStressResponse)
+async def filter_stress(request: FilterStressRequest) -> FilterStressResponse:
+    client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
+    qdrant = QdrantService(client)
+
+    scenario_inputs = [
+        {
+            "label": "no_filters",
+            "state": None,
+            "housing": None,
+            "caste": None,
+            "land_acres": None,
+        },
+        {
+            "label": "medium_filters",
+            "state": request.state,
+            "housing": request.housing_type,
+            "caste": None,
+            "land_acres": None,
+        },
+        {
+            "label": "heavy_filters",
+            "state": request.state,
+            "housing": request.housing_type,
+            "caste": request.caste,
+            "land_acres": request.land_acres,
+        },
+    ]
+
+    scenarios: list[FilterStressScenario] = []
+    query_text = request.query_text
+    query_vector = EmbeddingService(settings).embed_query(query_text)
+    sparse_vector = qdrant.build_sparse_query(query_text)
+
+    for scenario in scenario_inputs:
+        start = perf_counter()
+        points = qdrant.search_schemes(
+            query_vector=query_vector,
+            sparse_vector=sparse_vector,
+            state=scenario["state"],
+            housing=scenario["housing"],
+            caste=scenario["caste"],
+            land_acres=scenario["land_acres"],
+            limit=request.limit,
+        )
+        elapsed_ms = (perf_counter() - start) * 1000
+        scheme_ids = [str(point.payload.get("scheme_id")) for point in points if point.payload]
+        point_ids = [str(point.id) for point in points]
+        scenarios.append(
+            FilterStressScenario(
+                label=scenario["label"],
+                filters={
+                    "state": scenario["state"],
+                    "housing_type": scenario["housing"],
+                    "caste": scenario["caste"],
+                    "land_acres": scenario["land_acres"],
+                },
+                elapsed_ms=round(elapsed_ms, 2),
+                scheme_ids=scheme_ids,
+                point_ids=point_ids,
+            )
+        )
+
+    return FilterStressResponse(query_text=query_text, scenarios=scenarios)
 
 
 def update_timestamp() -> str:

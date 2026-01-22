@@ -24,6 +24,8 @@ Qdrant is critical for semantic search + metadata filtering + memory storage.
 - **Recommendation**: top schemes with explanation of matched filters + traceable Qdrant point IDs.
 - **Form readiness**: recommended schemes can be turned into prefilled form drafts with applicant
   details, ready to share with officials.
+- **Filter stress demo**: a backend endpoint compares retrieval under no/medium/heavy filters
+  to illustrate Qdrants performance under strict metadata constraints.
 
 ## 5. Evidence-based Outputs
 Each recommendation includes:
@@ -31,6 +33,7 @@ Each recommendation includes:
 - The filter matches (signals vs. rules)
 - A traceable relevance score
 - Qdrant point IDs for auditability
+- A shareable Evidence Pack with memory IDs, signals, and Qdrant IDs for judge review.
 
 ## 6. Limitations & Ethics
 See `docs/ethics.md` for risks and mitigations.

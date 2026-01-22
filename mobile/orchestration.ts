@@ -1,6 +1,7 @@
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 import {
+  BACKEND_URL,
   OPENAI_API_KEY,
   QDRANT_API_KEY,
   QDRANT_COLLECTIONS,
@@ -24,6 +25,7 @@ type AnalyzeResult = {
   signals: EligibilitySignals;
   explanations: Array<Record<string, unknown>>;
   memories: Array<Record<string, unknown>>;
+  memory_id?: string;
 };
 
 type AnalyzeInput = {
@@ -36,6 +38,7 @@ type AnalyzeInput = {
   intent: string | null;
   useVision: boolean;
   imageBase64: string | null;
+  useBackend?: boolean;
 };
 
 type QdrantSchemePayload = {
@@ -56,6 +59,13 @@ type QdrantPoint<TPayload> = {
 
 type QdrantSearchResponse<TPayload> = {
   result: Array<QdrantPoint<TPayload>>;
+};
+
+type BackendAnalyzeResponse = {
+  signals: EligibilitySignals;
+  explanations: Array<Record<string, unknown>>;
+  memories: Array<Record<string, unknown>>;
+  memory_id: string;
 };
 
 type QdrantUpsertResponse = {
@@ -100,6 +110,13 @@ async function requestJson<T>(url: string, options: RequestInit): Promise<T> {
     throw new Error(text || "Request failed");
   }
   return (await response.json()) as T;
+}
+
+function getBackendUrl(): string {
+  if (!BACKEND_URL || BACKEND_URL.startsWith("YOUR_")) {
+    throw new Error("Set BACKEND_URL in mobile/config.ts to use the backend API.");
+  }
+  return BACKEND_URL.replace(/\/$/, "");
 }
 
 function fallbackSignals(): EligibilitySignals {
@@ -382,7 +399,41 @@ async function saveMemory(
   );
 }
 
+async function analyzeViaBackend(input: AnalyzeInput): Promise<AnalyzeResult> {
+  const payload = {
+    state: input.state,
+    caste: input.caste,
+    land_acres: input.landAcres,
+    housing_type: input.housingType,
+    assets: input.assets,
+    demographics: input.demographics,
+    intent: input.intent,
+    use_vision: input.useVision,
+    image_base64: input.imageBase64,
+  };
+
+  const response = await requestJson<BackendAnalyzeResponse>(
+    `${getBackendUrl()}/analyze`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  return {
+    signals: response.signals,
+    explanations: response.explanations,
+    memories: response.memories,
+    memory_id: response.memory_id,
+  };
+}
+
 export async function runMobileOrchestration(input: AnalyzeInput): Promise<AnalyzeResult> {
+  if (input.useBackend) {
+    return analyzeViaBackend(input);
+  }
+
   ensureOpenAiKey();
   const embeddings = new OpenAIEmbeddings({ apiKey: OPENAI_API_KEY });
   let baseSignals = fallbackSignals();
