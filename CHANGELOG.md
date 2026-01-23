@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Added a hidden mock demo trigger (long-press the title) to open a Results view offline.
+- Fixed mobile boolean toggle normalization to prevent string/boolean crashes on launch.
 - Added a mobile Settings toggle to enable/disable backend mode on device.
 - Added mobile backend mode to retrieve hybrid results and memory IDs from the FastAPI API.
 - Added mobile case memory controls for status, feedback, chosen scheme, and evidence pack sharing.

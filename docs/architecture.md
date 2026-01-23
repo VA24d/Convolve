@@ -12,6 +12,8 @@ Yojana-Drishti is a multimodal eligibility assistant that combines:
 - **On-device or backend orchestration (mobile)** to run LangChain embeddings locally or call the
   FastAPI API for hybrid retrieval + memory IDs.
 - **Guided mobile UI** with safe-area support and Vision hints that allow missing details to be inferred from photos.
+- **Mobile toggle normalization** to keep boolean settings (Vision, auto-speak, backend mode) consistent across runtime environments.
+- **Hidden mock demo entry** to open a prefilled Results page without backend connectivity.
 - **Filter stress demo** endpoint to highlight retrieval under no/medium/heavy metadata filters.
 
 ## Data Flow

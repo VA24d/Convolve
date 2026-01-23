@@ -142,6 +142,7 @@ type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home"> & {
   onPickImage: () => Promise<void>;
   onTakePhoto: () => Promise<void>;
   onAnalyze: (navigation: HomeScreenProps["navigation"]) => Promise<void>;
+  onOpenMock: (navigation: HomeScreenProps["navigation"]) => void;
 };
 
 type ResultsScreenProps = NativeStackScreenProps<RootStackParamList, "Results"> & {
@@ -172,6 +173,42 @@ type SettingsScreenProps = NativeStackScreenProps<RootStackParamList, "Settings"
 const HOUSING_OPTIONS: HousingOption[] = ["kutcha", "pucca", "unknown"];
 const GENDER_OPTIONS: GenderOption[] = ["female", "male", "other", "prefer_not"];
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const MOCK_RESPONSE: AnalyzeResponse = {
+  signals: {
+    housing_type: "pucca",
+    assets: ["solar panel", "bicycle"],
+    demographics: ["widow", "senior"],
+    state: "Rajasthan",
+    caste: "SC",
+    land_acres: 1.5,
+    intent: "housing support for rural families",
+    notes: "Mock response for offline demo.",
+  },
+  explanations: [
+    {
+      scheme_name: "PM Awas Yojana",
+      benefits: "Subsidy for rural housing construction",
+      score: 0.86,
+      scheme_id: "PMAY-R",
+      point_id: "mock-point-1",
+    },
+    {
+      scheme_name: "National Social Assistance",
+      benefits: "Monthly pension for senior citizens",
+      score: 0.71,
+      scheme_id: "NSAP",
+      point_id: "mock-point-2",
+    },
+  ],
+  memories: [
+    {
+      summary: "Mock memory: widow senior seeking housing support",
+      created_at: new Date().toISOString(),
+    },
+  ],
+  memory_id: "mock-memory-001",
+};
 
 enableScreens();
 
@@ -278,9 +315,21 @@ function formatListValue(value: string[]): string {
   return value.length > 0 ? value.join(", ") : "";
 }
 
-function coerceBoolean(value: unknown): boolean {
+function normalizeBoolean(value: unknown): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
   if (typeof value === "string") {
-    return value.toLowerCase() === "true";
+    const normalized = value.trim().toLowerCase();
+    const truthyValues = ["true", "1", "yes", "y"];
+    if (truthyValues.indexOf(normalized) >= 0) {
+      return true;
+    }
+    const falsyValues = ["false", "0", "no", "n", ""];
+    if (falsyValues.indexOf(normalized) >= 0) {
+      return false;
+    }
+    return normalized.length > 0;
   }
   return Boolean(value);
 }
@@ -533,18 +582,25 @@ function HomeScreen(props: HomeScreenProps): JSX.Element {
   }
 
   function handleVisionToggle(value: boolean): void {
-    props.setUseVision(coerceBoolean(value));
+    props.setUseVision(normalizeBoolean(value));
   }
 
-  const useVisionValue = coerceBoolean(props.useVision);
+  const useVisionValue = normalizeBoolean(props.useVision);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Yojana-Drishti Mobile</Text>
-        <Text style={styles.caption}>
-          Mobile client for on-device LangChain orchestration with Qdrant.
-        </Text>
+        <Pressable
+          onLongPress={function onMockPress(): void {
+            props.onOpenMock(props.navigation);
+          }}
+          delayLongPress={800}
+        >
+          <Text style={styles.title}>Yojana-Drishti Mobile</Text>
+          <Text style={styles.caption}>
+            Mobile client for on-device LangChain orchestration with Qdrant.
+          </Text>
+        </Pressable>
         <View style={styles.navRow}>
           <Pressable
             style={styles.navButton}
@@ -1354,21 +1410,21 @@ function SchemeFormScreen(props: SchemeFormScreenProps): JSX.Element {
 
 function SettingsScreen(props: SettingsScreenProps): JSX.Element {
   function handleVisionToggle(value: boolean): void {
-    props.setUseVision(coerceBoolean(value));
+    props.setUseVision(normalizeBoolean(value));
   }
 
   function handleAutoSpeakToggle(value: boolean): void {
-    props.setAutoSpeak(coerceBoolean(value));
+    props.setAutoSpeak(normalizeBoolean(value));
   }
 
   function handleBackendToggle(value: boolean): void {
-    props.setUseBackend(coerceBoolean(value));
+    props.setUseBackend(normalizeBoolean(value));
   }
 
-  const useVisionValue = coerceBoolean(props.useVision);
-  const autoSpeakValue = coerceBoolean(props.autoSpeak);
+  const useVisionValue = normalizeBoolean(props.useVision);
+  const autoSpeakValue = normalizeBoolean(props.autoSpeak);
   const backendEnabled = props.backendAvailable;
-  const useBackendValue = backendEnabled && coerceBoolean(props.useBackend);
+  const useBackendValue = backendEnabled && normalizeBoolean(props.useBackend);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -1569,6 +1625,23 @@ export default function App(): JSX.Element {
     }
   }
 
+  function openMockResponse(
+    navigation: NativeStackScreenProps<RootStackParamList, "Home">["navigation"]
+  ): void {
+    const entry: HistoryEntry = {
+      id: `mock-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      intent: MOCK_RESPONSE.signals.intent ?? "Mock eligibility summary",
+      result: MOCK_RESPONSE,
+    };
+
+    setHistory(function addEntry(current) {
+      return [entry, ...current];
+    });
+
+    navigation.navigate("Results", { entry });
+  }
+
   function speakExplanations(explanations: Array<Record<string, unknown>>): void {
     const text = buildExplanationSpeech(explanations);
     Speech.stop();
@@ -1580,21 +1653,36 @@ export default function App(): JSX.Element {
   }
 
   function handleUseVisionChange(value: boolean): void {
-    setUseVision(coerceBoolean(value));
+    setUseVision(normalizeBoolean(value));
   }
 
   function handleAutoSpeakChange(value: boolean): void {
-    setAutoSpeak(coerceBoolean(value));
+    setAutoSpeak(normalizeBoolean(value));
   }
 
   function handleUseBackendChange(value: boolean): void {
-    setUseBackend(coerceBoolean(value));
+    setUseBackend(normalizeBoolean(value));
   }
 
+  useEffect(
+    function syncBooleanState() {
+      if (typeof useVision !== "boolean") {
+        setUseVision(normalizeBoolean(useVision));
+      }
+      if (typeof autoSpeak !== "boolean") {
+        setAutoSpeak(normalizeBoolean(autoSpeak));
+      }
+      if (typeof useBackend !== "boolean") {
+        setUseBackend(normalizeBoolean(useBackend));
+      }
+    },
+    [useVision, autoSpeak, useBackend]
+  );
+
   const backendAvailable = isBackendConfigured();
-  const useVisionValue = coerceBoolean(useVision);
-  const autoSpeakValue = coerceBoolean(autoSpeak);
-  const useBackendValue = backendAvailable && coerceBoolean(useBackend);
+  const useVisionValue = normalizeBoolean(useVision);
+  const autoSpeakValue = normalizeBoolean(autoSpeak);
+  const useBackendValue = backendAvailable && normalizeBoolean(useBackend);
 
   if (!backendAvailable) {
     console.warn("[App] BACKEND_URL is not configured; using on-device orchestration.");
@@ -1637,6 +1725,7 @@ export default function App(): JSX.Element {
                   onPickImage={pickImageFromLibrary}
                   onTakePhoto={takePhoto}
                   onAnalyze={analyze}
+                  onOpenMock={openMockResponse}
                 />
               );
             }}

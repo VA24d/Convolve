@@ -19,6 +19,18 @@ that can run orchestration on-device.
 - `mobile/` - Expo app with on-device LangChain.js orchestration.
 - `docs/` - Architecture, ethics, ADRs, and submission report.
 
+## File Structure (Pinnacle Archive)
+- `CHANGELOG.md` - Release notes and capability updates.
+- `README.md` - Project overview and usage guidance.
+- `requirements.txt` - Python dependency list.
+- `streamlit_app.py` - Streamlit demo entry point.
+- `mobile/` - Expo client for field use.
+- `docs/` - Architecture, ethics, ADRs, and reports.
+- `data/` - Seed data for schemes.
+- `scripts/` - Ingest, API, and demo helpers.
+- `src/convolve/` - Core retrieval and orchestration modules.
+- [`Convolve pitch deck.pptx`](./Convolve%20pitch%20deck.pptx) - Project pitch deck.
+
 ## Quickstart (Backend + Streamlit)
 1. Create a virtual environment and install dependencies:
 
@@ -61,8 +73,9 @@ python scripts/run_api.py
 ## Mobile App (Expo)
 The mobile app runs LangChain orchestration on-device and can optionally call the FastAPI
 backend (for hybrid retrieval + memory IDs). It supports photo capture/library selection,
-lets Vision fill missing details, and includes an end-to-end scheme form workflow for field
-officers.
+lets Vision fill missing details, keeps settings normalized to avoid boolean type crashes,
+includes a hidden mock demo (long-press the title), and includes an end-to-end scheme form
+workflow for field officers.
 
 1. Configure `mobile/config.ts` with your OpenAI key + Qdrant URL/API key.
    - Set `BACKEND_URL` to use the backend-powered analyze + memory updates.
